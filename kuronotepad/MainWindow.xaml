@@ -1,0 +1,74 @@
+﻿<Window x:Class="kuronotepad.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:kuronotepad"
+        mc:Ignorable="d"
+        Title="{Binding Title,Mode=OneWay,FallbackValue=無題 - クロノメモ帳}" Height="500" Width="800"
+        FocusManager.FocusedElement="{Binding ElementName=textBox}"        
+        Icon="Icon/KuroNntepad.ico"
+        Closing="Window_Closing" WindowState="Maximized" UseLayoutRounding="True" ResizeMode="CanResize">
+    <Window.Resources>
+        <local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+    </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Command="{x:Static local:MainWindow.GetTime}"  Key="F5"/>
+    </Window.InputBindings>
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:MainWindow.GetTime}" Executed="GetTime_Executed"/>
+        <CommandBinding Command="New" Executed="NewCommandBinding_Executed" />
+        <CommandBinding Command="Open" Executed="OpenCommandBinding_Executed" />
+        <CommandBinding Command="Save" Executed="SaveCommandBinding_Executed" />
+        <CommandBinding Command="SaveAs" Executed="SaveAsCommandBinding_Executed"/>
+    </Window.CommandBindings>
+
+    <DockPanel>
+        <Menu x:Name="menu" DockPanel.Dock="Top" Background="#FF0A0A0A" Foreground="#FFC8C8C8">
+            <MenuItem Header="ファイル(_F)">
+                <MenuItem Header="新規(_N)" Command="New" InputGestureText="Ctrl+N" Foreground="Black"/>
+                <MenuItem Header="開く(_O)" Command="Open" InputGestureText="Ctrl+O" Foreground="Black"/>
+                <MenuItem Name="SaveMenuItem" Header="上書き保存(_S)" Command="Save" InputGestureText="Ctrl+S" Foreground="Black"/>
+                <MenuItem Name="SaveAsMenuItem" Header="名前を付けて保存(_A)..." Command="SaveAs" Foreground="Black"/>
+            </MenuItem>
+            <MenuItem Header="エンコード(_M)">
+                <MenuItem Header="ShiftJISで保存" IsCheckable="True" IsChecked="{Binding Path=UTF8,Converter={StaticResource InverseBooleanConverter}}" Foreground="Black"/>
+                <MenuItem Header="UTF8で保存" IsCheckable="True" IsChecked="{Binding UTF8}" Foreground="Black"/>
+            </MenuItem>
+            <!--
+            <MenuItem Header="編集(_E)"/>
+            <MenuItem Header="書式(_O)"/>
+            <MenuItem Header="表示(_V)"/>
+            <MenuItem Header="ヘルプ(_H)"/>
+            -->
+        </Menu>
+
+        <StatusBar DockPanel.Dock="Bottom"  VerticalAlignment="Bottom" >
+            <StatusBar.Style>
+                <Style TargetType="StatusBar">
+                    <Setter Property="Background" Value="#FF68217A" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsDirty,Mode=OneWay}" Value="true">
+                            <Setter Property="Background" Value="#FF007ACC"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StatusBar.Style>
+            <TextBlock Text="{Binding Encode,Mode=OneWay}" Foreground="#FFE6E6E6" FocusManager.FocusedElement="{Binding ElementName=textBox}" Margin="2,0,0,0" />
+            <StatusBarItem Content="{Binding CaretPosition}" HorizontalAlignment="Right" Margin="0,0,40,0" Foreground="#FFE6E6E6"/>
+
+        </StatusBar>
+
+        <avalonEdit:TextEditor x:Name="textBox"                                                          
+                               FontSize="30pt"                              
+                               Background="Black"     
+                               ShowLineNumbers="True"
+                               LineNumbersForeground="#FF2B97BD"
+                               VerticalScrollBarVisibility="Auto"                          
+                               WordWrap="True"
+                               Foreground="Gainsboro"
+                               IsModified="{Binding IsDirty,Mode=TwoWay}"
+                               />
+    </DockPanel>
+</Window>
